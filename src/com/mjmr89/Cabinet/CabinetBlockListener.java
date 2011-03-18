@@ -64,10 +64,21 @@ public class CabinetBlockListener extends BlockListener {
 		CraftPlayer cPlayer = (CraftPlayer) p;
 		cPlayer.getHandle().a((IInventory) cInventory.getInventory());
 	}
+	
+	Block[] getDoubleChestOrder(Block b1, Block b2){
+		
+		if(b1.getX()<b2.getX() || b1.getZ() < b2.getZ()){
+			return new Block[]{b1,b2};
+		}
+		return new Block[]{b2,b1};
+		
+		
+	}
 
 	void openDoubleChest(Block b1, Block b2, Player p) {
-		Chest c1 = (Chest)b1.getState();
-		Chest c2 = (Chest)b2.getState();
+		Block[] blocks = getDoubleChestOrder(b1,b2);
+		Chest c1 = (Chest)blocks[0].getState();
+		Chest c2 = (Chest)blocks[1].getState();
 		CraftPlayer cPlayer = (CraftPlayer) p;
 
 		CraftInventory cInventory1 = (CraftInventory) c1.getInventory();
@@ -79,10 +90,12 @@ public class CabinetBlockListener extends BlockListener {
 
 	boolean covered(Block b) {
 		if (adjacentToChest(b)) {
-			if (solidBlock(getBlockAbove(getAdjacentChestBlock(b)))) {
+			Block adjBlock = getAdjacentChestBlock(b);
+			if (solidBlock(getBlockAbove(adjBlock)) || solidBlock(getBlockAbove(b))) {
 				return true;
 			}
-		} else {
+		} 
+		else {
 			if (solidBlock(getBlockAbove(b))) {
 				return true;
 			}
