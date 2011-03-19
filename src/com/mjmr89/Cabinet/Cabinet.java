@@ -15,9 +15,6 @@ public class Cabinet extends JavaPlugin {
 	// The plugin name.
 	static final String pluginName = "Cabinet";
 
-	private static final Pattern ratePattern = Pattern
-			.compile("\\s*(\\d+)\\s*:\\s*(\\d+)\\s*");
-
 	// Stuff used to interact with the server.
 	final Logger log = Logger.getLogger("Minecraft");
 	final Server server = this.getServer();
@@ -36,6 +33,8 @@ public class Cabinet extends JavaPlugin {
 		PluginManager pm = this.getServer().getPluginManager();
 
 		pm.registerEvent(Type.BLOCK_RIGHTCLICKED, blockListener,
+				Priority.Normal, this);
+		pm.registerEvent(Type.BLOCK_PLACED,blockListener,
 				Priority.Normal, this);
 
 		PluginDescriptionFile pdfFile = this.getDescription();

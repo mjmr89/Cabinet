@@ -1,17 +1,22 @@
 package com.mjmr89.Cabinet;
 
+import java.util.ArrayList;
+
 import net.minecraft.server.IInventory;
 import net.minecraft.server.InventoryLargeChest;
 
+import org.bukkit.Material;
 import org.bukkit.World;
 
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.inventory.CraftInventory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockRightClickEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.Inventory;
 
 public class CabinetBlockListener extends BlockListener {
@@ -25,6 +30,8 @@ public class CabinetBlockListener extends BlockListener {
 	public void onBlockRightClick(BlockRightClickEvent e) {
 		Block b = e.getBlock();
 		Player p = e.getPlayer();
+		BlockFace bf = e.getDirection();
+		Block airBlock;
 
 		// if its a chest and covered at least partially
 		if (b.getState() instanceof Chest && covered(b)) {
@@ -37,24 +44,59 @@ public class CabinetBlockListener extends BlockListener {
 				openSingleChest(b,p);
 			}
 			
-
 		}
-
-		//
-		// if (b.getState() instanceof Chest
-		// && (solidBlock(bAbove) || isPartiallyCovered(b))) {
-		// Player p = e.getPlayer();
-		// Inventory inv = ((Chest) b.getState()).getInventory();
-		// p.sendMessage("Size of inventory: " + inv.getSize());
-		//
-		// CraftInventory cInventory = (CraftInventory) inv;
-		// CraftPlayer cPlayer = (CraftPlayer) p;
-		// cPlayer.getHandle().a((IInventory) cInventory.getInventory());
-		// }
-
+		
+		//checks to place chest next to a double chest
+		airBlock = b.getFace(bf);
+		
+		if(e.getItemInHand().getType() == Material.CHEST){
+			if(isNextToDoubleChest(airBlock)){
+				plugin.getServer().broadcastMessage("U CAN HAS PLACE CHEST HERE!");
+				airBlock.setType(Material.CHEST);
+			}
+		}
+		
 	}
 	
+	boolean isNextToDoubleChest(Block b){
+		ArrayList<Block> list = getAdjacentChestBlocks(b);
+		ArrayList<Block> list2;
+		
+		plugin.getServer().broadcastMessage("list size: " + list.size());
+		
+		if(list.size() > 0){
+			for(Block block : list){
+				list2 = getAdjacentChestBlocks(block);
+				plugin.getServer().broadcastMessage("list2 size: " + list2.size());
+
+				if(list2.size()>0){
+					plugin.getServer().broadcastMessage("list2 > 0");
+
+					return true;
+				}
+			}
+		}
+		
+		
+		return false;
+	}
 	
+	ArrayList<Block> getAdjacentChestBlocks(Block b){
+		ArrayList<Block> list = new ArrayList<Block>();
+		World w = b.getWorld();
+		int x = b.getX();
+		int y = b.getY();
+		int z = b.getZ();
+		Block[] bArr = { w.getBlockAt(x + 1, y, z), w.getBlockAt(x - 1, y, z),
+				w.getBlockAt(x, y, z + 1), w.getBlockAt(x, y, z - 1) };
+		for (int i = 0; i < 4; i++) {
+			if (bArr[i].getState() instanceof Chest) {
+				list.add(bArr[i]);
+			}
+		}
+		
+		return list;
+	}
 
 	void openSingleChest(Block b, Player p) {
 		Inventory inv = ((Chest) b.getState()).getInventory();
