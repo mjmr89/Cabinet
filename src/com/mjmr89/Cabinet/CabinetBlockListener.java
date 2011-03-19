@@ -3,7 +3,6 @@ package com.mjmr89.Cabinet;
 import net.minecraft.server.IInventory;
 import net.minecraft.server.InventoryLargeChest;
 
-import org.bukkit.Material;
 import org.bukkit.World;
 
 import org.bukkit.block.Block;
